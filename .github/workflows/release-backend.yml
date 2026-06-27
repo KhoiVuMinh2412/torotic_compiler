@@ -1,0 +1,49 @@
+name: Automatically Package and Release Backend
+
+on:
+  push:
+    tags:
+      - "v*" # Sẽ tự động chạy khi bạn tạo tag mới dạng v1.0, v1.1...
+  workflow_dispatch: # Cho phép bạn bấm nút chạy thủ công trên giao diện GitHub
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      # Bước 1: Tải mã nguồn từ repo về máy ảo GitHub
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Bước 2: Cài đặt môi trường Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+
+      # Bước 3: Cài đặt các thư viện trong package.json
+      - name: Install dependencies
+        run: npm install
+
+      # Bước 4: Cài đặt pkg toàn cục trên máy ảo để đóng gói
+      - name: Install pkg
+        run: npm install -g pkg
+
+      # Bước 5: Chạy lệnh đóng gói ra cả hai định dạng Windows và Linux
+      - name: Build Binaries via pkg
+        run: |
+          mkdir -p dist
+          pkg server.js --targets node20-win-x64 --output dist/torotic-backend-windows.exe
+          pkg server.js --targets node20-linux-x64 --output dist/torotic-backend-linux
+
+      # Bước 6: Đẩy các file đã đóng gói lên GitHub Releases
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            dist/torotic-backend-windows.exe
+            dist/torotic-backend-linux
+          body: "Bản cập nhật tự động cho Torotic Backend Compiler."
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
