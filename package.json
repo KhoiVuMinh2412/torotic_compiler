@@ -1,21 +1,26 @@
 {
   "name": "torotic_compiler",
   "version": "1.0.0",
-  "description": "",
-  "main": "server.js",
   "bin": "server.js",
-  "scripts": {
-    "start": "node server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "type": "commonjs",
   "dependencies": {
     "body-parser": "^2.3.0",
     "cors": "^2.8.6",
     "express": "^5.2.1",
     "serialport": "^13.0.0"
+  },
+  "devDependencies": {
+    "@yao-pkg/pkg": "^5.11.1"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "build": "pkg ."
+  },
+  "pkg": {
+    "targets": [
+      "node22-linux-x64",
+      "node22-win-x64"
+    ],
+    "outputPath": "dist"
   }
 }
