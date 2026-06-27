@@ -22,7 +22,7 @@ jobs:
           node-version: 24
           cache: "npm"
 
-       bondage- name: Install dependencies
+      - name: Install dependencies
         run: npm install
 
       # Bước 4: Đổi sang cài đặt gói pkg của cộng đồng duy trì
