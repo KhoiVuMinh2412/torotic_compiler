@@ -6,35 +6,41 @@ on:
       - "v*"
   workflow_dispatch:
 
+# Tắt các cảnh báo liên quan đến runtime cũ của GitHub ở cấp độ toàn bộ Job
+env:
+  ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: "true"
+
 jobs:
   build-and-release:
     runs-on: ubuntu-latest
     steps:
-      # Bước 1: Checkout sử dụng phiên bản mới nhất (đã cập nhật runtime nội bộ)
+      # Bước 1: Nâng cấp lên v5 để tương thích hoàn toàn runtime mới
       - name: Checkout code
-        uses: actions/checkout@v4.2.2 # 👈 Cập nhật số bản vá cụ thể nếu cần, hoặc giữ v4 nếu GitHub tự resolve bản mới nhất sạch warning
+        uses: actions/checkout@v5
 
-      # Bước 2: Khởi tạo môi trường Node.js 24
+      # Bước 2: Nâng cấp lên v5 để chạy mượt mà trên nền Node 24
       - name: Setup Node.js
-        uses: actions/setup-node@v4.2.0 # 👈 Hoặc sử dụng tag đã fix lỗi runtime tương thích Node 24
+        uses: actions/setup-node@v5
         with:
           node-version: 24
           cache: "npm"
 
+      # Bước 3: Cài đặt các thư viện trong package.json
       - name: Install dependencies
         run: npm install
 
-      # Các bước dưới giữ nguyên...
+      # Bước 4: Cài đặt pkg toàn cục trên máy ảo để đóng gói
       - name: Install pkg
         run: npm install -g pkg
 
+      # Bước 5: Chạy lệnh đóng gói ra cả hai định dạng Windows và Linux
       - name: Build Binaries via pkg
         run: |
           mkdir -p dist
           pkg server.js --targets node24-win-x64 --output dist/torotic-backend-windows.exe
           pkg server.js --targets node24-linux-x64 --output dist/torotic-backend-linux
 
-      # Sử dụng tag v2 mới nhất của release action
+      # Bước 6: Đẩy các file đã đóng gói lên GitHub Releases
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
