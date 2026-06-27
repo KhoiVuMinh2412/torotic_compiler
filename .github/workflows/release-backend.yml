@@ -22,7 +22,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
-          node-version: 24
+          node-version: 22
           cache: "npm"
 
       # Bước 3: Cài đặt các thư viện trong package.json
@@ -36,9 +36,9 @@ jobs:
       # Bước 5: Chạy lệnh đóng gói ra cả hai định dạng Windows và Linux
       - name: Build Binaries via pkg
         run: |
-          mkdir -p dist
-          pkg server.js --targets node24-win-x64 --output dist/torotic-backend-windows.exe
-          pkg server.js --targets node24-linux-x64 --output dist/torotic-backend-linux
+        mkdir -p dist
+        pkg server.js --targets node22-win-x64 --output dist/torotic-backend-windows.exe
+        pkg server.js --targets node22-linux-x64 --output dist/torotic-backend-linux
 
       # Bước 6: Đẩy các file đã đóng gói lên GitHub Releases
       - name: Create GitHub Release
