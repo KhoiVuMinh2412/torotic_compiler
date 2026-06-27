@@ -6,7 +6,6 @@ on:
       - "v*"
   workflow_dispatch:
 
-# Tắt các cảnh báo liên quan đến runtime cũ của GitHub ở cấp độ toàn bộ Job
 env:
   ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: "true"
 
@@ -14,33 +13,29 @@ jobs:
   build-and-release:
     runs-on: ubuntu-latest
     steps:
-      # Bước 1: Nâng cấp lên v5 để tương thích hoàn toàn runtime mới
       - name: Checkout code
         uses: actions/checkout@v5
 
-      # Bước 2: Nâng cấp lên v5 để chạy mượt mà trên nền Node 24
       - name: Setup Node.js
         uses: actions/setup-node@v5
         with:
-          node-version: 22
+          node-version: 24
           cache: "npm"
 
-      # Bước 3: Cài đặt các thư viện trong package.json
-      - name: Install dependencies
+       bondage- name: Install dependencies
         run: npm install
 
-      # Bước 4: Cài đặt pkg toàn cục trên máy ảo để đóng gói
-      - name: Install pkg
-        run: npm install -g pkg
+      # Bước 4: Đổi sang cài đặt gói pkg của cộng đồng duy trì
+      - name: Install community-maintained pkg
+        run: npm install -g @yao-pkg/pkg
 
-      # Bước 5: Chạy lệnh đóng gói ra cả hai định dạng Windows và Linux
+      # Bước 5: Sử dụng lệnh `yao-pkg` thay vì `pkg` cũ
       - name: Build Binaries via pkg
         run: |
           mkdir -p dist
-          pkg server.js --targets node22-win-x64 --output dist/torotic-backend-windows.exe
-          pkg server.js --targets node22-linux-x64 --output dist/torotic-backend-linux
+          yao-pkg server.js --targets node24-win-x64 --output dist/torotic-backend-windows.exe
+          yao-pkg server.js --targets node24-linux-x64 --output dist/torotic-backend-linux
 
-      # Bước 6: Đẩy các file đã đóng gói lên GitHub Releases
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
