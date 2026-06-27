@@ -1,4 +1,4 @@
-name: Automatically Package and Release Backend
+name: Tự động đóng gói và phát hành Backend
 
 on:
   push:
@@ -10,15 +10,15 @@ jobs:
   build-and-release:
     runs-on: ubuntu-latest
     steps:
-      # Bước 1: Tải mã nguồn từ repo về máy ảo GitHub
+      # Bước 1: Tải mã nguồn từ repo về máy ảo GitHub (Giữ v4 hoặc cập nhật nếu GitHub ra bản mới)
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Bước 2: Cài đặt môi trường Node.js
+      # Bước 2: Cài đặt môi trường Node.js (Chuyển sang bản Node 24 để đồng bộ)
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           cache: "npm"
 
       # Bước 3: Cài đặt các thư viện trong package.json
@@ -29,12 +29,12 @@ jobs:
       - name: Install pkg
         run: npm install -g pkg
 
-      # Bước 5: Chạy lệnh đóng gói ra cả hai định dạng Windows và Linux
+      # Bước 5: Chạy lệnh đóng gói ra cả hai định dạng Windows và Linux (Sửa node20 thành node24)
       - name: Build Binaries via pkg
         run: |
           mkdir -p dist
-          pkg server.js --targets node20-win-x64 --output dist/torotic-backend-windows.exe
-          pkg server.js --targets node20-linux-x64 --output dist/torotic-backend-linux
+          pkg server.js --targets node24-win-x64 --output dist/torotic-backend-windows.exe
+          pkg server.js --targets node24-linux-x64 --output dist/torotic-backend-linux
 
       # Bước 6: Đẩy các file đã đóng gói lên GitHub Releases
       - name: Create GitHub Release
